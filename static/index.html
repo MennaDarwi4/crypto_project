@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CryptoLab — Live AES vs DES</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- NOISE TEXTURE -->
+<div class="noise"></div>
+
+<!-- ── HEADER ─────────────────────────────── -->
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <span class="logo-icon">⬡</span>
+      <span class="logo-text">CryptoLab</span>
+      <span class="logo-tag">LIVE</span>
+    </div>
+    <nav class="header-nav">
+      <a href="#messages">Messages</a>
+      <a href="#results">Results</a>
+      <a href="#metrics">Metrics</a>
+      <a href="#decrypt">Decrypt</a>
+      <a href="#decrypted-output">Outputs</a>
+    </nav>
+    <div class="header-status" id="serverStatus">
+      <span class="dot"></span> Connecting…
+    </div>
+  </div>
+</header>
+
+<!-- ── HERO ───────────────────────────────── -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="grid-lines"></div>
+  </div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Interactive Encryption Lab</p>
+    <h1>
+      <span class="h1-aes">AES</span>
+      <span class="h1-vs">vs</span>
+      <span class="h1-des">DES</span>
+    </h1>
+    <p class="hero-sub">Type chat messages, encrypt them live with both algorithms, and compare performance and security side by side — in real time.</p>
+    <div class="hero-badges">
+      <span class="hb aes">AES-128-CBC</span>
+      <span class="hb des">DES-56-CBC</span>
+      <span class="hb neutral">PKCS#7</span>
+      <span class="hb neutral">pycryptodome</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── MESSAGES PANEL ─────────────────────── -->
+<section class="section" id="messages">
+  <div class="section-label">01 / Chat Messages</div>
+  <div class="section-header">
+    <h2>Message Editor</h2>
+    <div class="header-actions">
+      <button class="btn btn-ghost" id="loadSampleBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Load Sample
+      </button>
+      <button class="btn btn-ghost" id="addMsgBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Message
+      </button>
+    </div>
+  </div>
+
+  <div class="messages-list" id="messagesList">
+    <!-- Populated by JS -->
+  </div>
+
+  <div class="encrypt-bar">
+    <div class="encrypt-bar-info" id="encryptBarInfo">
+      <span class="eb-count" id="msgCount">0</span> messages · <span id="byteCount">0</span> bytes
+    </div>
+    <button class="btn btn-primary" id="encryptBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Encrypt &amp; Compare
+    </button>
+  </div>
+</section>
+
+<!-- ── ENCRYPTION RESULTS ─────────────────── -->
+<section class="section" id="results">
+  <div class="section-label">02 / Encryption Results</div>
+  <div class="section-header">
+    <h2>Ciphertext Output</h2>
+  </div>
+
+  <div class="results-placeholder" id="resultsPlaceholder">
+    <div class="placeholder-icon">🔐</div>
+    <p>Encrypt your messages to see results here.</p>
+  </div>
+
+  <div class="results-grid hidden" id="resultsGrid">
+    <!-- AES Card -->
+    <div class="result-card aes-card">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="algo-dot aes-dot"></span>
+          <span class="algo-name">AES-128</span>
+          <span class="algo-sub">Advanced Encryption Standard</span>
+        </div>
+        <span class="security-badge secure">✓ SECURE</span>
+      </div>
+      <div class="card-body">
+        <div class="field-group">
+          <label>Ciphertext Preview</label>
+          <div class="cipher-preview" id="aesCipherPreview">—</div>
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <label>Key (hex)</label>
+            <div class="mono-field" id="aesKey">—</div>
+          </div>
+          <div class="field-group">
+            <label>IV (hex)</label>
+            <div class="mono-field" id="aesIV">—</div>
+          </div>
+        </div>
+        <div class="field-row three">
+          <div class="stat-mini">
+            <span class="sm-label">Key Size</span>
+            <span class="sm-val aes-text" id="aesKeySize">—</span>
+          </div>
+          <div class="stat-mini">
+            <span class="sm-label">Block Size</span>
+            <span class="sm-val aes-text" id="aesBlockSize">—</span>
+          </div>
+          <div class="stat-mini">
+            <span class="sm-label">Output Size</span>
+            <span class="sm-val aes-text" id="aesCipherSize">—</span>
+          </div>
+        </div>
+        <div class="io-section">
+          <label>Encrypted output</label>
+          <p class="io-hint">Ciphertext produced by the program: full hex and Base64, or save as a binary file.</p>
+          <span class="io-sub">Hex (full)</span>
+          <textarea class="output-textarea" id="aesCipherHexFull" readonly rows="5" spellcheck="false" aria-label="AES ciphertext hex"></textarea>
+          <span class="io-sub">Base64 (full)</span>
+          <textarea class="output-textarea" id="aesCipherB64Full" readonly rows="4" spellcheck="false" aria-label="AES ciphertext Base64"></textarea>
+          <div class="io-actions">
+            <button type="button" class="btn btn-ghost io-btn" data-algo="AES" data-action="copy-hex">Copy hex</button>
+            <button type="button" class="btn btn-ghost io-btn" data-algo="AES" data-action="copy-b64">Copy Base64</button>
+            <button type="button" class="btn btn-ghost io-btn" data-algo="AES" data-action="dl-hex">Download .hex</button>
+            <button type="button" class="btn btn-ghost io-btn" data-algo="AES" data-action="dl-b64">Download .b64</button>
+            <button type="button" class="btn btn-ghost io-btn" data-algo="AES" data-action="dl-bin">Download .bin</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DES Card -->
+    <div class="result-card des-card">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="algo-dot des-dot"></span>
+          <span class="algo-name">DES-56</span>
+          <span class="algo-sub">Data Encryption Standard</span>
+        </div>
+        <span class="security-badge insecure">⚠ LEGACY</span>
+      </div>
+      <div class="card-body">
+        <div class="field-group">
+          <label>Ciphertext Preview</label>
+          <div class="cipher-preview" id="desCipherPreview">—</div>
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <label>Key (hex)</label>
+            <div class="mono-field" id="desKey">—</div>
+          </div>
+          <div class="field-group">
+            <label>IV (hex)</label>
+            <div class="mono-field" id="desIV">—</div>
+          </div>
+        </div>
+        <div class="field-row three">
+          <div class="stat-mini">
+            <span class="sm-label">Key Size</span>
+            <span class="sm-val des-text" id="desKeySize">—</span>
+          </div>
+          <div class="stat-mini">
+            <span class="sm-label">Block Size</span>
+            <span class="sm-val des-text" id="desBlockSize">—</span>
+          </div>
+          <div class="stat-mini">
+            <span class="sm-label">Output Size</span>
+            <span class="sm-val des-text" id="desCipherSize">—</span>
+          </div>
+        </div>
+        <div class="io-section">
+          <label>Encrypted output</label>
+          <p class="io-hint">Ciphertext produced by the program: full hex and Base64, or save as a binary file.</p>
+          <span class="io-sub">Hex (full)</span>
+          <textarea class="output-textarea" id="desCipherHexFull" readonly rows="5" spellcheck="false" aria-label="DES ciphertext hex"></textarea>
+          <span class="io-sub">Base64 (full)</span>
+          <textarea class="output-textarea" id="desCipherB64Full" readonly rows="4" spellcheck="false" aria-label="DES ciphertext Base64"></textarea>
+          <div class="io-actions">
+            <button type="button" class="btn btn-ghost io-btn" data-algo="DES" data-action="copy-hex">Copy hex</button>
+            <button type="button" class="btn btn-ghost io-btn" data-algo="DES" data-action="copy-b64">Copy Base64</button>
+            <button type="button" class="btn btn-ghost io-btn" data-algo="DES" data-action="dl-hex">Download .hex</button>
+            <button type="button" class="btn btn-ghost io-btn" data-algo="DES" data-action="dl-b64">Download .b64</button>
+            <button type="button" class="btn btn-ghost io-btn" data-algo="DES" data-action="dl-bin">Download .bin</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PERFORMANCE METRICS ────────────────── -->
+<section class="section" id="metrics">
+  <div class="section-label">03 / Performance Dashboard</div>
+  <div class="section-header">
+    <h2>Live Benchmarks</h2>
+  </div>
+
+  <div class="metrics-placeholder" id="metricsPlaceholder">
+    <div class="placeholder-icon">📊</div>
+    <p>Performance data will appear after encryption.</p>
+  </div>
+
+  <div class="metrics-body hidden" id="metricsBody">
+    <!-- Timing Cards -->
+    <div class="timing-row">
+      <div class="timing-card">
+        <div class="tc-icon aes-bg">⚡</div>
+        <div class="tc-body">
+          <span class="tc-label">AES Encryption</span>
+          <span class="tc-val aes-text" id="aesEncTime">—</span>
+        </div>
+      </div>
+      <div class="timing-card">
+        <div class="tc-icon des-bg">⚡</div>
+        <div class="tc-body">
+          <span class="tc-label">DES Encryption</span>
+          <span class="tc-val des-text" id="desEncTime">—</span>
+        </div>
+      </div>
+      <div class="timing-card">
+        <div class="tc-icon aes-bg">🔓</div>
+        <div class="tc-body">
+          <span class="tc-label">AES Decryption</span>
+          <span class="tc-val aes-text" id="aesDecTime">—</span>
+        </div>
+      </div>
+      <div class="timing-card">
+        <div class="tc-icon des-bg">🔓</div>
+        <div class="tc-body">
+          <span class="tc-label">DES Decryption</span>
+          <span class="tc-val des-text" id="desDecTime">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bar Charts -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-title">Encryption Time (ms)</div>
+        <div class="bar-chart" id="encTimeChart"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Key Size (bits)</div>
+        <div class="bar-chart" id="keySizeChart"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Block Size (bytes)</div>
+        <div class="bar-chart" id="blockSizeChart"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Ciphertext Size (bytes)</div>
+        <div class="bar-chart" id="cipherSizeChart"></div>
+      </div>
+    </div>
+
+    <!-- Security Comparison -->
+    <div class="security-grid">
+      <div class="sec-card aes-sec">
+        <div class="sec-rating">
+          <span class="sec-score">A+</span>
+          <span class="sec-label">Security Rating</span>
+        </div>
+        <h3>AES-128-CBC</h3>
+        <ul class="sec-points">
+          <li>✓ 128-bit key — 2<sup>128</sup> combinations</li>
+          <li>✓ NIST approved & industry standard</li>
+          <li>✓ Used in TLS, SSH, VPN, file encryption</li>
+          <li>✓ Resistant to known cryptanalytic attacks</li>
+          <li>✓ IV prevents identical ciphertext leakage</li>
+        </ul>
+      </div>
+      <div class="sec-card des-sec">
+        <div class="sec-rating">
+          <span class="sec-score">F</span>
+          <span class="sec-label">Security Rating</span>
+        </div>
+        <h3>DES-56-CBC</h3>
+        <ul class="sec-points">
+          <li>✗ 56-bit key — crackable in &lt; 24 hours</li>
+          <li>✗ Deprecated by NIST since 2005</li>
+          <li>✗ Vulnerable to brute-force attacks</li>
+          <li>✗ Known differential cryptanalysis weaknesses</li>
+          <li>⚠ For educational use only</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── DECRYPT PANEL ───────────────────────── -->
+<section class="section" id="decrypt">
+  <div class="section-label">04 / Decrypt & Verify</div>
+  <div class="section-header">
+    <h2>Decrypt Messages</h2>
+  </div>
+
+  <div class="decrypt-placeholder" id="decryptPlaceholder">
+    <div class="placeholder-icon">🔑</div>
+    <p>Encrypt messages first to enable decryption.</p>
+  </div>
+
+  <div class="decrypt-body hidden" id="decryptBody">
+    <div class="decrypt-controls">
+      <div class="algo-toggle">
+        <button class="toggle-btn active" data-algo="AES" id="toggleAES">AES</button>
+        <button class="toggle-btn" data-algo="DES" id="toggleDES">DES</button>
+      </div>
+      <button class="btn btn-primary" id="decryptBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+        Decrypt Selected
+      </button>
+    </div>
+
+    <div class="decrypt-result hidden" id="decryptResult">
+      <div class="dr-header">
+        <span class="dr-algo" id="drAlgo">AES</span>
+        <span class="dr-time" id="drTime">—</span>
+        <span class="dr-verified" id="drVerified">✓ Verified</span>
+      </div>
+      <div class="decrypted-messages" id="decryptedMessages"></div>
+      <div class="decrypt-io" id="decrypted-output">
+        <label>Decrypted output</label>
+        <p class="io-hint">Recovered plaintext as JSON (same structure as before encryption). Save as a file or copy for your report.</p>
+        <textarea class="output-textarea" id="decryptedRawOut" readonly rows="10" spellcheck="false" aria-label="Decrypted JSON"></textarea>
+        <div class="io-actions">
+          <button type="button" class="btn btn-ghost" id="decCopyJson">Copy JSON</button>
+          <button type="button" class="btn btn-ghost" id="decDlJson">Download decrypted.json</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TOAST ──────────────────────────────── -->
+<div class="toast hidden" id="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+# Generated lab artifacts (keep folder via output/.gitkeep)
+output/*
+!output/.gitkeep
+
+# Custom message payloads (not the bundled sample)
+data/user_input.json
+
+venv/
+__pycache__/
+*.pyc

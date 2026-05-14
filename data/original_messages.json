@@ -1,0 +1,27 @@
+[
+  {
+    "sender": "Alice",
+    "message": "Hey Bob, did you finish the encryption module?",
+    "timestamp": "2024-01-15T09:00:00Z"
+  },
+  {
+    "sender": "Bob",
+    "message": "Almost! AES-128 is working perfectly. Testing DES now for comparison.",
+    "timestamp": "2024-01-15T09:02:00Z"
+  },
+  {
+    "sender": "Alice",
+    "message": "Great. Remember DES is just for educational purposes - it's considered legacy.",
+    "timestamp": "2024-01-15T09:03:00Z"
+  },
+  {
+    "sender": "Bob",
+    "message": "Exactly. The key size difference is wild - AES has 2^128 combinations vs DES 2^56.",
+    "timestamp": "2024-01-15T09:05:00Z"
+  },
+  {
+    "sender": "Alice",
+    "message": "Modern hardware can brute-force DES in hours. Stick with AES in production!",
+    "timestamp": "2024-01-15T09:06:00Z"
+  }
+]
